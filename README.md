@@ -40,45 +40,86 @@ To write a program to implement Stochastic Gradient Descent (SGD) Regressor for 
 # Program to implement SGD Regressor for linear regression.
 # Importing necessary libraries
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
 
 # Load the dataset
-file_path = 'https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-ML240EN-SkillsNetwork/labs/encoded_car_data.csv'
-df = pd.read_csv(file_path)
+data = pd.read_csv('CarPrice_Assignment.csv')
+print(data.head())
+print("\n\n")
+print(data.info())
 
-# Select relevant features and target variable
-X = df.drop(columns=['price'])  # All columns except 'price'
-y = df['price']  # Target variable
+# Data preprocessing
+# Dropping unnecessary columns and handling categorical variables
+data = data.drop(['CarName', 'car_ID'], axis=1)
+data = pd.get_dummies(data, drop_first=True)
 
-# Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Splitting the data into features and target variable
+x = data.drop('price', axis=1)
+y = data['price']
 
-# Train the SGD Regressor
-sgd_model = SGDRegressor(max_iter=1000, tol=1e-3, random_state=42)  # Default settings
-sgd_model.fit(X_train, y_train)
+# Standardizing the data
+scaler = StandardScaler()
+x = scaler.fit_transform(x)
+y = scaler.fit_transform(np.array(y).reshape(-1, 1)).ravel()
 
-# Predictions on test set
-y_pred = sgd_model.predict(X_test)
 
-# Evaluate the model
-print("Model Performance:")
-print("Mean Squared Error (MSE):", mean_squared_error(y_test, y_pred))
-print("R-squared:", r2_score(y_test, y_pred))
+# Splitting the dataset into training and testing sets
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
+
+# Creating the SGD Regressor model
+sgd_model = SGDRegressor(max_iter=1000, tol=1e-3)
+
+# Fitting the model on the training data
+sgd_model.fit(x_train, y_train)
+
+# Making predictions
+y_pred = sgd_model.predict(x_test)
+
+# Evaluating model performance
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+# Print evaluation metrics
+print()
+print()
+print("Mean Squared Error:", mse)
+print("R-squared Score:", r2)
 
 # Print model coefficients
-print("\nModel Coefficients:")
+print("\n\n")
+print("Model Coefficients")
 print("Coefficients:", sgd_model.coef_)
 print("Intercept:", sgd_model.intercept_)
+
+# Visualizing actual vs predicted prices
+print("\n\n")
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual Prices")
+plt.ylabel("Predicted Prices using SGD Regressor")
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red')  # Perfect prediction line
+plt.show()
+
 Developed by:G.Ramanujam 
 RegisterNumber: 212224240129
 */
 ```
 
 ## Output:
-![Screenshot 2025-05-05 153014](https://github.com/user-attachments/assets/a6c2b21f-369e-4028-ba6f-5c33c46c3069)
 
+## LOAD THE DATASET:
+![Screenshot 2025-05-10 160523](https://github.com/user-attachments/assets/196d5f7c-f808-4833-a5dd-bbbab46b2852)
+![Screenshot 2025-05-10 160634](https://github.com/user-attachments/assets/2733d58b-47f1-49be-863f-7d289dababc3)
+## EVALUATION METRICS:
+![Screenshot 2025-05-10 160824](https://github.com/user-attachments/assets/f71e2f93-40f3-4d16-b980-0996c919815d)
+## MODEL COEFFICIENTS:
+![Screenshot 2025-05-10 160836](https://github.com/user-attachments/assets/df456305-dbb7-411c-a05f-9dc8d2888783)
+## VISUALIZATION OF ACTUAL VS PREDICTED VALUES:
+![Screenshot 2025-05-10 161026](https://github.com/user-attachments/assets/873ec71c-7190-413b-9b1c-01b3a15a3c75)
 
 
 ## Result:
